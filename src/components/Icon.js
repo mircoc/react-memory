@@ -17,12 +17,14 @@ const icons = [
     Snake
 ];
 
+export const ICONS_IDS = [0, 1, 2, 3, 4, 5];
+
 const style = {
     icon: {       
     }
 };
 
-class Cell extends Component {
+class Icon extends Component {
 
     render() {
         if (!this.props.revealed) {
@@ -32,11 +34,11 @@ class Cell extends Component {
         }
 
         const id = this.props.iconId || 0;
-        const Icon = icons[ id ];
+        const IconImage = icons[ id ];
         return (
-            <Icon width={'100%'} height={'100%'}/>
+            <IconImage width={'100%'} height={'100%'}/>
         );
     }
 }
 
-export default Cell;
+export default Icon;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import Cell from './Cell';
+import { ICONS_IDS } from './Icon';
 
 const style = {
     grid: {
@@ -8,7 +9,7 @@ const style = {
         gridTemplateColumns: 'repeat(3, 18vmin)',
         gridTemplateRows: 'repeat(4, 18vmin)',
         gridGap: '0.5em',
-        backgroundColor: '#f00',
+        backgroundColor: '#fff',
         color: '#444',
         height: '100vh',
         width: '100vw',
@@ -37,16 +38,35 @@ class Board extends Component {
     constructor(props) {
         super(props);
 
+        const size = this.props.size;
+        if (size % 2 !== 0) {
+            throw new Error("size must be even!");
+        }
+
+        let iconsId = ICONS_IDS.slice();
+        let iconPosition = [];
+        for (let i=0; i<size; i=i+2) {
+            const icon = iconsId.pop();
+            // if icons bucket is empty refill it
+            if (icon === undefined) {
+                iconsId = ICONS_IDS.slice();
+            }
+            // place the same icon in two position
+            iconPosition[i] = icon;
+            iconPosition[i+1] = icon;
+        }
+        const randomizedIconPosition = iconPosition.sort(() => Math.random() - 0.5);
         this.state = {
             finished: false,
-            cellIdToIconId: [0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5], // FIXME randomize it
-            cellIdOpened: [false, false, false, false, false, false, false, false, false, false, false, false ],
+            cellIdToIconId: randomizedIconPosition,
+            cellIdOpened: [...Array(size)].fill(false),
             waitingToCloseBadCouple: false,
             moves: 0,
             width: 0,
             height: 0,
             coupleOpened: [],
         };
+        console.log("Board initial state: ", this.state);
 
         this.onCellRevealRequest = this.onCellRevealRequest.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -206,8 +226,8 @@ class Board extends Component {
     render() {
         const size = this.props.size;
         const maxSquareSize = this.getMaxSquareSize(this.state.width, this.state.height, size);
-        const cols = Math.round(this.state.width / maxSquareSize);
-        const rows = Math.round(this.state.height / maxSquareSize);
+        const cols = Math.floor(this.state.width / maxSquareSize);
+        const rows = Math.floor(this.state.height / maxSquareSize);
         const perc = (100/Math.max(rows, cols)).toFixed();
 
         const gridStyleDynamic = {
